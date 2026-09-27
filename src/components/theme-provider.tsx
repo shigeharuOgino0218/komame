@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 
-type Theme = "dark" | "light" | "system"
+export type Theme = "dark" | "light" | "system"
 type ResolvedTheme = "dark" | "light"
 
 type ThemeProviderProps = {
@@ -17,6 +17,11 @@ type ThemeProviderState = {
 }
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
+// ブラウザ UI / ステータスバーの色。index.css の --background と揃える
+const THEME_COLORS: Record<ResolvedTheme, string> = {
+  light: "#fcfbf8",
+  dark: "#0c0a09",
+}
 const THEME_VALUES: Theme[] = ["dark", "light", "system"]
 
 const ThemeProviderContext = React.createContext<
@@ -112,6 +117,11 @@ export function ThemeProvider({
 
       root.classList.remove("light", "dark")
       root.classList.add(resolvedTheme)
+      document
+        .querySelectorAll('meta[name="theme-color"]')
+        .forEach((meta) =>
+          meta.setAttribute("content", THEME_COLORS[resolvedTheme])
+        )
 
       if (restoreTransitions) {
         restoreTransitions()
