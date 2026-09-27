@@ -30,13 +30,13 @@ select is(
   1, 'サインアップで owner として世帯が1つ作られる');
 select is(
   (select count(*)::int from public.categories, ctx where household_id = a_household),
-  6, '初期カテゴリが6件作られる');
+  5, '初期カテゴリが5件作られる');
 select is(
   (select count(*)::int from public.payment_methods, ctx where household_id = a_household),
   5, '初期支払方法が5件作られる');
 select results_eq(
   $$ select name from public.categories, ctx where household_id = a_household order by sort_order $$,
-  $$ values ('食費'), ('日用品'), ('交通費'), ('娯楽'), ('固定費'), ('その他') $$,
+  $$ values ('食費'), ('日用品'), ('交通費'), ('娯楽'), ('固定費') $$,
   '初期カテゴリの名前と並び順');
 
 -- ---------------------------------------------------------------------------
@@ -51,7 +51,7 @@ select is(
   0, 'A には B の支出が見えない');
 select is(
   (select count(*)::int from public.categories),
-  6, 'A には自分の世帯のカテゴリだけが見える');
+  5, 'A には自分の世帯のカテゴリだけが見える');
 select is(
   (select count(*)::int from public.households),
   1, 'A には自分の世帯だけが見える');

@@ -11,11 +11,15 @@ export function CategoryGrid({
   selectedId: string | null
   onToggle: (id: string) => void
 }) {
+  // カテゴリ数に合わせて1段に並べる（6個を超えたら折り返す）。読み込み中は初期マスタの5列
+  const columns = Math.min(Math.max(categories?.length ?? 5, 1), 6)
+
   return (
     <div
       role="group"
       aria-label="カテゴリ（任意）"
-      className="grid grid-cols-6 gap-1.5"
+      className="grid gap-1.5"
+      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
     >
       {categories
         ? categories.map((category) => {
@@ -38,7 +42,7 @@ export function CategoryGrid({
               </button>
             )
           })
-        : Array.from({ length: 6 }, (_, index) => (
+        : Array.from({ length: columns }, (_, index) => (
             <div key={index} className="h-14 rounded-2xl bg-muted" />
           ))}
     </div>
