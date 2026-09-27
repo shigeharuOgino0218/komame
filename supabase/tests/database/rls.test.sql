@@ -36,7 +36,7 @@ select is(
   4, '初期支払方法が4件作られる');
 select results_eq(
   $$ select name from public.categories, ctx where household_id = a_household order by sort_order $$,
-  $$ values ('食費'), ('日用品'), ('交通費'), ('娯楽'), ('固定費'), ('医療費') $$,
+  $$ values ('食費'), ('日用品'), ('交通費'), ('娯楽'), ('医療費'), ('固定費') $$,
   '初期カテゴリの名前と並び順');
 select results_eq(
   $$ select name from public.payment_methods, ctx where household_id = a_household order by sort_order $$,

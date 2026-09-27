@@ -1,6 +1,6 @@
 -- 初期マスタの見直し
 -- - カテゴリ・支払方法の「その他」を外す。迷う支出は未選択（NULL）のまま記録する
--- - カテゴリに「医療費」を追加する
+-- - カテゴリに「医療費」を「固定費」の前に追加する
 
 -- 既存の世帯：削除ではなくアーカイブにして、記録済みの支出のカテゴリ表示は残す
 update public.categories
@@ -15,12 +15,26 @@ where name = 'その他'
   and type = 'other'
   and archived_at is null;
 
--- 既存の世帯：「医療費」を末尾に追加（同名がすでにあれば何もしない）
+-- 既存の世帯：「医療費」を「固定費」の位置に追加し、「固定費」を1つ後ろにずらす
+-- （固定費が無い世帯は末尾に追加。同名がすでにあれば何もしない）
 insert into public.categories (household_id, name, icon, sort_order)
 select h.id, '医療費', 'pill',
-  coalesce((select max(c.sort_order) from public.categories c where c.household_id = h.id), 0) + 1
+  coalesce(
+    (select c.sort_order from public.categories c
+     where c.household_id = h.id and c.kind = 'expense' and c.name = '固定費'),
+    (select max(c.sort_order) + 1 from public.categories c where c.household_id = h.id),
+    1
+  )
 from public.households h
 on conflict (household_id, kind, name) do nothing;
+
+update public.categories fixed
+set sort_order = medical.sort_order + 1
+from public.categories medical
+where fixed.household_id = medical.household_id
+  and fixed.kind = 'expense' and fixed.name = '固定費'
+  and medical.kind = 'expense' and medical.name = '医療費'
+  and fixed.sort_order <= medical.sort_order;
 
 -- 今後作られるユーザーの初期マスタ（シグネチャは変えないので既存の権限はそのまま）
 create or replace function private.initialize_user(
@@ -55,8 +69,8 @@ begin
     (new_household_id, '日用品', 'shopping-basket', 2),
     (new_household_id, '交通費', 'train-front', 3),
     (new_household_id, '娯楽', 'sparkles', 4),
-    (new_household_id, '固定費', 'house', 5),
-    (new_household_id, '医療費', 'pill', 6);
+    (new_household_id, '医療費', 'pill', 5),
+    (new_household_id, '固定費', 'house', 6);
 
   insert into public.payment_methods (household_id, name, type, icon, sort_order) values
     (new_household_id, '現金', 'cash', 'banknote', 1),
