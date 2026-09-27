@@ -36,7 +36,7 @@ export function PaymentMethodChips({
         : Array.from({ length: 4 }, (_, index) => (
             <div
               key={index}
-              className="h-10 w-24 shrink-0 rounded-full bg-muted/50"
+              className="h-10 w-24 shrink-0 rounded-full bg-muted"
             />
           ))}
     </div>

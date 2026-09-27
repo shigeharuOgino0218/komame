@@ -137,7 +137,7 @@ export function EntryPage() {
       />
 
       <Keypad
-        className="h-[clamp(168px,calc(100dvh-460px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+        className="h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
         onDigit={(key) => dispatch({ type: "digit", key })}
         onBackspace={() => dispatch({ type: "backspace" })}
         onClear={() => dispatch({ type: "clear" })}
