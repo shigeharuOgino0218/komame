@@ -2,7 +2,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(17);
 
 -- テストユーザー A / B（トリガーで世帯と初期マスタが作られる）
 insert into auth.users (id, email, aud, role) values
@@ -34,6 +34,10 @@ select is(
 select is(
   (select count(*)::int from public.payment_methods, ctx where household_id = a_household),
   5, '初期支払方法が5件作られる');
+select results_eq(
+  $$ select name from public.categories, ctx where household_id = a_household order by sort_order $$,
+  $$ values ('食費'), ('日用品'), ('交通費'), ('娯楽'), ('固定費'), ('その他') $$,
+  '初期カテゴリの名前と並び順');
 
 -- ---------------------------------------------------------------------------
 -- ユーザー A として操作
