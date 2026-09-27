@@ -15,7 +15,7 @@ const digitRows: DigitKey[][] = [
 ]
 
 const keyClassName =
-  "flex touch-manipulation items-center justify-center rounded-2xl bg-muted/60 text-2xl font-medium tabular-nums transition-colors select-none [-webkit-touch-callout:none] active:bg-muted"
+  "flex touch-manipulation items-center justify-center rounded-2xl bg-muted/80 text-2xl font-medium tabular-nums transition-colors select-none [-webkit-touch-callout:none] active:bg-muted"
 
 export function Keypad({
   onDigit,

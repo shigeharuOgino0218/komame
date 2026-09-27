@@ -3,7 +3,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import type { DigitKey } from "@/features/entry/amount"
 import { AmountDisplay } from "@/features/entry/components/amount-display"
-import { CategoryGrid } from "@/features/entry/components/category-grid"
+import { CategoryChips } from "@/features/entry/components/category-chips"
 import { DateChip } from "@/features/entry/components/date-chip"
 import { Keypad } from "@/features/entry/components/keypad"
 import { MemoField } from "@/features/entry/components/memo-field"
@@ -130,21 +130,21 @@ export function EntryPage() {
         onToggle={(id) => dispatch({ type: "toggle-payment-method", id })}
       />
 
-      <CategoryGrid
+      <CategoryChips
         categories={categories}
         selectedId={state.categoryId}
         onToggle={(id) => dispatch({ type: "toggle-category", id })}
       />
 
       <Keypad
-        className="h-[clamp(168px,calc(100dvh-460px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+        className="h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
         onDigit={(key) => dispatch({ type: "digit", key })}
         onBackspace={() => dispatch({ type: "backspace" })}
         onClear={() => dispatch({ type: "clear" })}
       />
 
       <Button
-        className="h-13 rounded-2xl text-base font-semibold"
+        className="h-13 rounded-full text-base font-semibold"
         disabled={!canSave}
         onClick={handleSave}
       >
