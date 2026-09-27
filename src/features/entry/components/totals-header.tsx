@@ -1,4 +1,5 @@
 import { BrandMark } from "@/components/brand-mark"
+import { SettingsLink } from "@/components/settings-link"
 import { useExpenseTotals } from "@/features/transactions/queries"
 import { formatYen } from "@/lib/money"
 
@@ -12,9 +13,9 @@ export function TotalsHeader({ householdId }: { householdId?: string }) {
   ]
 
   return (
-    <header className="flex h-12 items-center justify-between gap-4">
-      <BrandMark className="size-6" />
-      <dl className="flex gap-5">
+    <header className="flex h-12 items-center gap-2">
+      <BrandMark className="size-6 shrink-0" />
+      <dl className="ml-auto flex gap-4">
         {items.map(({ label, value }) => (
           <div key={label} className="flex flex-col items-end">
             <dt className="text-[10px] leading-4 text-muted-foreground">
@@ -26,6 +27,7 @@ export function TotalsHeader({ householdId }: { householdId?: string }) {
           </div>
         ))}
       </dl>
+      <SettingsLink className="-mr-2 shrink-0" />
     </header>
   )
 }
