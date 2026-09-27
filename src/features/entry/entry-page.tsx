@@ -144,7 +144,7 @@ export function EntryPage() {
       />
 
       <Button
-        className="h-13 rounded-2xl text-base font-semibold"
+        className="h-13 rounded-full text-base font-semibold"
         disabled={!canSave}
         onClick={handleSave}
       >

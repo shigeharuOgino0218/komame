@@ -37,7 +37,7 @@ export function CategoryChips({
                 className={chipClassName(
                   selected,
                   cn(
-                    "h-14 flex-col justify-center gap-1 rounded-2xl px-1 text-[11px] leading-none",
+                    "h-16 flex-col justify-center gap-2 rounded-2xl px-1 text-[11px] leading-none",
                     chipWidth
                   )
                 )}
@@ -52,7 +52,7 @@ export function CategoryChips({
         : Array.from({ length: 6 }, (_, index) => (
             <div
               key={index}
-              className={cn("h-14 shrink-0 rounded-2xl bg-muted", chipWidth)}
+              className={cn("h-16 shrink-0 rounded-2xl bg-muted", chipWidth)}
             />
           ))}
     </div>
