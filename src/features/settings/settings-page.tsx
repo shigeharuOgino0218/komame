@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/features/auth/auth-provider"
+import { ThemeSelect } from "@/features/settings/theme-select"
 import { supabase } from "@/lib/supabase"
 
 export function SettingsPage() {
@@ -40,6 +41,13 @@ export function SettingsPage() {
         <section className="flex flex-col gap-1 rounded-2xl bg-card p-4 ring-1 ring-border/60">
           <p className="text-xs text-muted-foreground">ログイン中</p>
           <p className="text-sm">{auth.session?.user.email}</p>
+        </section>
+        <section className="flex flex-col gap-2">
+          <h2 className="px-1 text-xs text-muted-foreground">テーマ</h2>
+          <ThemeSelect />
+          <p className="px-1 text-xs text-muted-foreground">
+            自動は端末の設定（ライト / ダーク）に合わせます
+          </p>
         </section>
         <Button
           variant="outline"
