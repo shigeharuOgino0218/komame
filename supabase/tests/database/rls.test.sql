@@ -40,7 +40,7 @@ select results_eq(
   '初期カテゴリの名前と並び順');
 select results_eq(
   $$ select name from public.payment_methods, ctx where household_id = a_household order by sort_order $$,
-  $$ values ('現金'), ('PayPay'), ('クレジットカード'), ('銀行振込') $$,
+  $$ values ('PayPay'), ('現金'), ('クレジットカード'), ('銀行振込') $$,
   '初期支払方法の名前と並び順');
 
 -- ---------------------------------------------------------------------------

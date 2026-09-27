@@ -1,6 +1,7 @@
 -- 初期マスタの見直し
 -- - カテゴリ・支払方法の「その他」を外す。迷う支出は未選択（NULL）のまま記録する
 -- - カテゴリに「医療費」を「固定費」の前に追加する
+-- - 支払方法を「PayPay」→「現金」の順にする
 
 -- 既存の世帯：削除ではなくアーカイブにして、記録済みの支出のカテゴリ表示は残す
 update public.categories
@@ -35,6 +36,16 @@ where fixed.household_id = medical.household_id
   and fixed.kind = 'expense' and fixed.name = '固定費'
   and medical.kind = 'expense' and medical.name = '医療費'
   and fixed.sort_order <= medical.sort_order;
+
+-- 既存の世帯：「現金」と「PayPay」の並び順を入れ替える（現金が前にある場合だけ）
+update public.payment_methods m
+set sort_order = case m.name when '現金' then paypay.sort_order else cash.sort_order end
+from public.payment_methods cash
+join public.payment_methods paypay on paypay.household_id = cash.household_id
+where cash.name = '現金' and paypay.name = 'PayPay'
+  and cash.sort_order < paypay.sort_order
+  and m.household_id = cash.household_id
+  and m.name in ('現金', 'PayPay');
 
 -- 今後作られるユーザーの初期マスタ（シグネチャは変えないので既存の権限はそのまま）
 create or replace function private.initialize_user(
@@ -73,8 +84,8 @@ begin
     (new_household_id, '固定費', 'house', 6);
 
   insert into public.payment_methods (household_id, name, type, icon, sort_order) values
-    (new_household_id, '現金', 'cash', 'banknote', 1),
-    (new_household_id, 'PayPay', 'qr', 'qr-code', 2),
+    (new_household_id, 'PayPay', 'qr', 'qr-code', 1),
+    (new_household_id, '現金', 'cash', 'banknote', 2),
     (new_household_id, 'クレジットカード', 'credit_card', 'credit-card', 3),
     (new_household_id, '銀行振込', 'bank', 'landmark', 4);
 end;
