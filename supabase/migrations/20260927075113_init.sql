@@ -268,10 +268,14 @@ create policy "members can delete transactions" on public.transactions
   using (household_id in (select private.my_household_ids()));
 
 -- ---------------------------------------------------------------------------
--- サインアップ時の初期化：世帯・メンバー・プロフィール・初期マスタ
+-- ユーザー初期化：世帯・メンバー・プロフィール・初期マスタ
 -- ---------------------------------------------------------------------------
-create function private.handle_new_user()
-returns trigger
+create function private.initialize_user(
+  p_user_id uuid,
+  p_email text,
+  p_user_meta jsonb
+)
+returns void
 language plpgsql
 security definer
 set search_path = ''
@@ -280,16 +284,16 @@ declare
   new_household_id uuid;
 begin
   insert into public.households (name, created_by)
-  values ('マイ家計簿', new.id)
+  values ('マイ家計簿', p_user_id)
   returning id into new_household_id;
 
   insert into public.household_members (household_id, user_id, role)
-  values (new_household_id, new.id, 'owner');
+  values (new_household_id, p_user_id, 'owner');
 
   insert into public.profiles (id, display_name, current_household_id)
   values (
-    new.id,
-    coalesce(new.raw_user_meta_data ->> 'display_name', split_part(new.email, '@', 1)),
+    p_user_id,
+    coalesce(p_user_meta ->> 'display_name', split_part(p_email, '@', 1)),
     new_household_id
   );
 
@@ -307,13 +311,29 @@ begin
     (new_household_id, 'クレジットカード', 'credit_card', 'credit-card', 3),
     (new_household_id, '銀行振込', 'bank', 'landmark', 4),
     (new_household_id, 'その他', 'other', 'ellipsis', 5);
+end;
+$$;
 
+create function private.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  perform private.initialize_user(new.id, new.email, new.raw_user_meta_data);
   return new;
 end;
 $$;
 
+revoke all on function private.initialize_user(uuid, text, jsonb) from public, anon, authenticated;
 revoke all on function private.handle_new_user() from public, anon, authenticated;
 
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function private.handle_new_user();
+
+-- このマイグレーションより前に作られたユーザー（ダッシュボードで先に作成した場合など）も初期化する
+select private.initialize_user(u.id, u.email, u.raw_user_meta_data)
+from auth.users u
+where not exists (select 1 from public.profiles p where p.id = u.id);
