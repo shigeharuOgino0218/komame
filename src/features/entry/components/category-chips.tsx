@@ -1,8 +1,16 @@
+import { cn } from "cn"
+
 import { chipClassName } from "@/features/entry/components/chip"
 import { MasterIcon } from "@/features/masters/master-icon"
 import type { Category } from "@/features/masters/queries"
 
-export function CategoryGrid({
+/**
+ * 5個がまるごと見え、6個目が半分見切れる幅にして、横スクロールで続きがあると分かるようにする。
+ * 左余白16px + 5.5w + 間隔6px×5 = スクロール領域の幅（100% + 左右余白32px）→ w = (100% - 14px) / 5.5
+ */
+const chipWidth = "w-[calc((100%-14px)/5.5)]"
+
+export function CategoryChips({
   categories,
   selectedId,
   onToggle,
@@ -11,15 +19,11 @@ export function CategoryGrid({
   selectedId: string | null
   onToggle: (id: string) => void
 }) {
-  // カテゴリ数に合わせて1段に並べる（6個を超えたら折り返す）。読み込み中は初期マスタの5列
-  const columns = Math.min(Math.max(categories?.length ?? 5, 1), 6)
-
   return (
     <div
       role="group"
       aria-label="カテゴリ（任意）"
-      className="grid gap-1.5"
-      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+      className="-mx-4 flex [scrollbar-width:none] gap-1.5 overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden"
     >
       {categories
         ? categories.map((category) => {
@@ -32,18 +36,24 @@ export function CategoryGrid({
                 title={category.name}
                 className={chipClassName(
                   selected,
-                  "h-14 flex-col justify-center gap-1 rounded-2xl px-1 text-[11px] leading-none"
+                  cn(
+                    "h-14 flex-col justify-center gap-1 rounded-2xl px-1 text-[11px] leading-none",
+                    chipWidth
+                  )
                 )}
                 onClick={() => onToggle(category.id)}
               >
                 <MasterIcon name={category.icon} className="size-5" />
-                {/* 1マスに収まるのは3文字程度。長い名前は末尾を省略する */}
+                {/* 1マスに収まるのは3〜4文字。長い名前は末尾を省略する */}
                 <span className="max-w-full truncate">{category.name}</span>
               </button>
             )
           })
-        : Array.from({ length: columns }, (_, index) => (
-            <div key={index} className="h-14 rounded-2xl bg-muted" />
+        : Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className={cn("h-14 shrink-0 rounded-2xl bg-muted", chipWidth)}
+            />
           ))}
     </div>
   )

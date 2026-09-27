@@ -3,7 +3,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import type { DigitKey } from "@/features/entry/amount"
 import { AmountDisplay } from "@/features/entry/components/amount-display"
-import { CategoryGrid } from "@/features/entry/components/category-grid"
+import { CategoryChips } from "@/features/entry/components/category-chips"
 import { DateChip } from "@/features/entry/components/date-chip"
 import { Keypad } from "@/features/entry/components/keypad"
 import { MemoField } from "@/features/entry/components/memo-field"
@@ -130,7 +130,7 @@ export function EntryPage() {
         onToggle={(id) => dispatch({ type: "toggle-payment-method", id })}
       />
 
-      <CategoryGrid
+      <CategoryChips
         categories={categories}
         selectedId={state.categoryId}
         onToggle={(id) => dispatch({ type: "toggle-category", id })}
