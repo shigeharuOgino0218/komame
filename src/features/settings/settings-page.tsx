@@ -1,29 +1,42 @@
 import { ChevronLeftIcon } from "lucide-react"
-import { Link } from "react-router"
+import { useNavigate } from "react-router"
 
 import { PageHeader } from "@/components/page-header"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { useAuth } from "@/features/auth/auth-provider"
 import { supabase } from "@/lib/supabase"
 
 export function SettingsPage() {
   const auth = useAuth()
+  const navigate = useNavigate()
+
+  // 設定はどの画面からも開くので、開く前の画面に戻る。直接開いたときは入力画面へ
+  const goBack = () => {
+    const canGoBack = (window.history.state?.idx ?? 0) > 0
+    if (canGoBack) {
+      navigate(-1)
+    } else {
+      navigate("/", { replace: true })
+    }
+  }
 
   return (
     <>
       <PageHeader
         title="設定"
         action={
-          <Link
-            to="/summary"
+          <Button
+            variant="ghost"
+            size="icon"
             aria-label="戻る"
-            className={buttonVariants({ variant: "ghost", size: "icon" })}
+            className="-mr-2"
+            onClick={goBack}
           >
             <ChevronLeftIcon className="size-5" />
-          </Link>
+          </Button>
         }
       />
-      <div className="flex flex-col gap-6 px-5">
+      <div className="flex flex-col gap-6 px-4">
         <section className="flex flex-col gap-1 rounded-2xl bg-card p-4 ring-1 ring-border/60">
           <p className="text-xs text-muted-foreground">ログイン中</p>
           <p className="text-sm">{auth.session?.user.email}</p>
