@@ -1,9 +1,9 @@
-import { DeleteIcon } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "cn"
 
 import type { DigitKey } from "@/features/entry/amount"
+import { BackspaceIcon } from "@/features/entry/components/backspace-icon"
 
 const LONG_PRESS_MS = 500
 
@@ -87,7 +87,7 @@ function BackspaceKey({
         longPressed.current = false
       }}
     >
-      <DeleteIcon className="size-6" />
+      <BackspaceIcon className="size-7" />
     </button>
   )
 }
