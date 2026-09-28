@@ -6,9 +6,9 @@ import type { Category } from "@/features/masters/queries"
 
 /**
  * 5個がまるごと見え、6個目が半分見切れる幅にして、横スクロールで続きがあると分かるようにする。
- * 左余白16px + 5.5w + 間隔6px×5 = スクロール領域の幅（100% + 左右余白32px）→ w = (100% - 14px) / 5.5
+ * 左余白16px + 5.5w + 間隔4px×5 = スクロール領域の幅（100% + 左右余白32px）→ w = (100% - 4px) / 5.5
  */
-const chipWidth = "w-[calc((100%-14px)/5.5)]"
+const chipWidth = "w-[calc((100%-4px)/5.5)]"
 
 export function CategoryChips({
   categories,
@@ -23,7 +23,7 @@ export function CategoryChips({
     <div
       role="group"
       aria-label="カテゴリ（任意）"
-      className="-mx-4 flex [scrollbar-width:none] gap-1.5 overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden"
+      className="-mx-4 flex [scrollbar-width:none] gap-1 overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden"
     >
       {categories
         ? categories.map((category) => {

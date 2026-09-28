@@ -16,6 +16,8 @@ export type EntryState = {
   /** null = 今日（日付が変わっても自動で追従する） */
   date: Ymd | null
   memo: string
+  /** 自由貯金から払う。うっかり払い続けないよう保存のたびにオフに戻す */
+  fromSavings: boolean
 }
 
 type EntryAction =
@@ -26,6 +28,7 @@ type EntryAction =
   | { type: "toggle-payment-method"; id: string }
   | { type: "set-date"; date: Ymd | null }
   | { type: "set-memo"; memo: string }
+  | { type: "toggle-savings" }
   | { type: "reset-after-save" }
 
 function reducer(state: EntryState, action: EntryAction): EntryState {
@@ -50,6 +53,8 @@ function reducer(state: EntryState, action: EntryAction): EntryState {
       return { ...state, date: action.date }
     case "set-memo":
       return { ...state, memo: action.memo }
+    case "toggle-savings":
+      return { ...state, fromSavings: !state.fromSavings }
     case "reset-after-save":
       // 支払方法は次回も使うことが多いので残す。日付は取り違え防止のため今日に戻す
       return {
@@ -58,6 +63,7 @@ function reducer(state: EntryState, action: EntryAction): EntryState {
         paymentMethodId: state.paymentMethodId,
         date: null,
         memo: "",
+        fromSavings: false,
       }
   }
 }
@@ -89,5 +95,6 @@ export function useEntryForm() {
     paymentMethodId: readLastPaymentMethod(),
     date: null,
     memo: "",
+    fromSavings: false,
   }))
 }

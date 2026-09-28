@@ -30,7 +30,7 @@ export function Keypad({
 }) {
   return (
     <div
-      className={cn("grid grid-cols-3 grid-rows-4 gap-2", className)}
+      className={cn("grid grid-cols-3 grid-rows-4 gap-1", className)}
       onContextMenu={(event) => event.preventDefault()}
     >
       {digitRows.flat().map((key) => (

@@ -34,6 +34,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      budgets: {
+        Row: {
+          amount: number | null
+          created_at: string
+          effective_from: string
+          household_id: string
+          period: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          effective_from: string
+          household_id: string
+          period: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          effective_from?: string
+          household_id?: string
+          period?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budgets_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           archived_at: string | null
@@ -224,6 +259,7 @@ export type Database = {
           created_by: string | null
           currency: string
           external_id: string | null
+          funding: string
           household_id: string
           id: string
           memo: string | null
@@ -242,6 +278,7 @@ export type Database = {
           created_by?: string | null
           currency?: string
           external_id?: string | null
+          funding?: string
           household_id: string
           id?: string
           memo?: string | null
@@ -260,6 +297,7 @@ export type Database = {
           created_by?: string | null
           currency?: string
           external_id?: string | null
+          funding?: string
           household_id?: string
           id?: string
           memo?: string | null
@@ -300,7 +338,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      savings_balance: { Args: { p_household_id: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never

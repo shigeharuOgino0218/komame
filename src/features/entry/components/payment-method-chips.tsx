@@ -15,7 +15,7 @@ export function PaymentMethodChips({
     <div
       role="group"
       aria-label="支払方法（任意）"
-      className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden"
+      className="-mx-4 flex [scrollbar-width:none] gap-1 overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden"
     >
       {paymentMethods
         ? paymentMethods.map((method) => {

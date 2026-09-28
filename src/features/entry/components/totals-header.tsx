@@ -1,15 +1,31 @@
+import { cn } from "cn"
+
 import { BrandMark } from "@/components/brand-mark"
 import { SettingsLink } from "@/components/settings-link"
+import { currentBudgets } from "@/features/budget/current-budget"
+import { useBudgets } from "@/features/budget/queries"
 import { useExpenseTotals } from "@/features/transactions/queries"
+import { todayYmd } from "@/lib/date"
 import { formatYen } from "@/lib/money"
 
 export function TotalsHeader({ householdId }: { householdId?: string }) {
   const { data } = useExpenseTotals(householdId)
+  const { data: budgetRows } = useBudgets(householdId)
+  const budgets = budgetRows && currentBudgets(budgetRows, todayYmd())
+
+  // 予算がある期間は「あといくら使えるか」を出す
+  const period = (label: string, spent?: number, budget?: number | null) =>
+    budget == null
+      ? { label, value: spent }
+      : {
+          label: `${label} 残り`,
+          value: spent === undefined ? undefined : budget - spent,
+        }
 
   const items = [
     { label: "今日", value: data?.today },
-    { label: "今週", value: data?.week },
-    { label: "今月", value: data?.month },
+    period("今週", data?.week, budgets?.week),
+    period("今月", data?.month, budgets?.month),
   ]
 
   return (
@@ -21,7 +37,12 @@ export function TotalsHeader({ householdId }: { householdId?: string }) {
             <dt className="text-[10px] leading-4 text-muted-foreground">
               {label}
             </dt>
-            <dd className="text-sm leading-5 font-medium tabular-nums">
+            <dd
+              className={cn(
+                "text-sm leading-5 font-medium tabular-nums",
+                value !== undefined && value < 0 && "text-destructive"
+              )}
+            >
               {value === undefined ? "–" : formatYen(value)}
             </dd>
           </div>

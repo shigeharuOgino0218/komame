@@ -11,6 +11,7 @@ export type NewTransaction = Required<
     | "category_id"
     | "payment_method_id"
     | "memo"
+    | "funding"
   >
 >
 
