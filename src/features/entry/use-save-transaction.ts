@@ -3,6 +3,10 @@ import * as React from "react"
 import { toast } from "sonner"
 
 import {
+  adjustSavingsBalanceCache,
+  budgetKeys,
+} from "@/features/budget/queries"
+import {
   deleteTransaction,
   insertTransaction,
   type NewTransaction,
@@ -30,11 +34,33 @@ export function useSaveTransaction() {
   return React.useCallback(
     (input: NewTransaction, description: string) => {
       const invalidate = () =>
-        queryClient.invalidateQueries({ queryKey: transactionKeys.all })
+        Promise.all([
+          queryClient.invalidateQueries({ queryKey: transactionKeys.all }),
+          queryClient.invalidateQueries({
+            queryKey: budgetKeys.savingsBalanceAll,
+          }),
+        ])
+
+      // 予算から払った支出は合計へ、貯金から払った支出は残高へ即反映する
+      const fromSavings = input.funding === "savings"
+      const applyToCache = () => {
+        if (fromSavings) {
+          adjustSavingsBalanceCache(queryClient, -input.amount)
+        } else {
+          addToTotalsCache(queryClient, input)
+        }
+      }
+      const revertCache = () => {
+        if (fromSavings) {
+          adjustSavingsBalanceCache(queryClient, input.amount)
+        } else {
+          removeFromTotalsCache(queryClient, input.id)
+        }
+      }
 
       const undo = async () => {
         undoneIds.add(input.id)
-        removeFromTotalsCache(queryClient, input.id)
+        revertCache()
         try {
           await pendingInserts.get(input.id)?.catch(() => undefined)
           await deleteTransaction(input.id)
@@ -48,7 +74,7 @@ export function useSaveTransaction() {
 
       const save = () => {
         undoneIds.delete(input.id)
-        addToTotalsCache(queryClient, input)
+        applyToCache()
         toast.success(`${formatYen(input.amount)} を記録`, {
           id: input.id,
           description,
@@ -62,7 +88,7 @@ export function useSaveTransaction() {
           .then(() => invalidate())
           .catch(() => {
             if (undoneIds.has(input.id)) return
-            removeFromTotalsCache(queryClient, input.id)
+            revertCache()
             toast.error(`${formatYen(input.amount)} を保存できませんでした`, {
               id: input.id,
               description,

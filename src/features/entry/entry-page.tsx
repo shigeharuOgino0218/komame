@@ -70,6 +70,7 @@ export function EntryPage() {
         category_id: state.categoryId,
         payment_method_id: paymentMethodId,
         memo: state.memo.trim() || null,
+        funding: "budget",
       },
       description
     )

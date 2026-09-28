@@ -28,6 +28,8 @@ export function useExpenseTotals(householdId: string | undefined) {
         .select("id, amount, occurred_on")
         .eq("household_id", householdId!)
         .eq("type", "expense")
+        // 自由貯金から払った支出は予算の外なので合計に含めない
+        .eq("funding", "budget")
         .gte("occurred_on", from)
         .lte("occurred_on", today)
       if (error) throw error
