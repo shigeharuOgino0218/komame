@@ -1,6 +1,8 @@
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
+import { hasEverSetBudget } from "@/features/budget/current-budget"
+import { useBudgets, useSavingsBalance } from "@/features/budget/queries"
 import type { DigitKey } from "@/features/entry/amount"
 import { AmountDisplay } from "@/features/entry/components/amount-display"
 import { CategoryChips } from "@/features/entry/components/category-chips"
@@ -8,6 +10,7 @@ import { DateChip } from "@/features/entry/components/date-chip"
 import { Keypad } from "@/features/entry/components/keypad"
 import { MemoField } from "@/features/entry/components/memo-field"
 import { PaymentMethodChips } from "@/features/entry/components/payment-method-chips"
+import { SavingsChip } from "@/features/entry/components/savings-chip"
 import { TotalsHeader } from "@/features/entry/components/totals-header"
 import {
   rememberPaymentMethod,
@@ -40,8 +43,19 @@ export function EntryPage() {
   const { data: categories } = useCategories(householdId)
   const { data: paymentMethods } = usePaymentMethods(householdId)
   const [state, dispatch] = useEntryForm()
+  const { data: budgetRows } = useBudgets(householdId)
   const saveTransaction = useSaveTransaction()
   const today = todayYmd()
+
+  // 予算を一度も設定していない世帯には自由貯金を出さない
+  const showSavings = budgetRows !== undefined && hasEverSetBudget(budgetRows)
+  const { data: savingsBalance } = useSavingsBalance(householdId, {
+    enabled: showSavings,
+  })
+  const fromSavings = showSavings && state.fromSavings
+  const savingsShort =
+    fromSavings &&
+    (savingsBalance === undefined || state.amount > savingsBalance)
 
   // 前回の支払方法がアーカイブ済みなどで存在しなければ未選択扱い
   const paymentMethodId =
@@ -50,14 +64,18 @@ export function EntryPage() {
           ?.id ?? null)
       : state.paymentMethodId
 
-  const canSave = state.amount > 0 && householdId !== undefined
+  const canSave = state.amount > 0 && householdId !== undefined && !savingsShort
 
   const handleSave = () => {
-    if (state.amount <= 0 || householdId === undefined) return
+    if (!canSave || householdId === undefined) return
 
     const category = categories?.find((c) => c.id === state.categoryId)
     const paymentMethod = paymentMethods?.find((m) => m.id === paymentMethodId)
-    const description = [category?.name ?? "未分類", paymentMethod?.name]
+    const description = [
+      category?.name ?? "未分類",
+      paymentMethod?.name,
+      fromSavings && "自由貯金",
+    ]
       .filter(Boolean)
       .join("・")
 
@@ -70,7 +88,7 @@ export function EntryPage() {
         category_id: state.categoryId,
         payment_method_id: paymentMethodId,
         memo: state.memo.trim() || null,
-        funding: "budget",
+        funding: fromSavings ? "savings" : "budget",
       },
       description
     )
@@ -123,6 +141,14 @@ export function EntryPage() {
           value={state.memo}
           onChange={(memo) => dispatch({ type: "set-memo", memo })}
         />
+        {showSavings && (
+          <SavingsChip
+            balance={savingsBalance}
+            selected={fromSavings}
+            insufficient={savingsShort}
+            onToggle={() => dispatch({ type: "toggle-savings" })}
+          />
+        )}
       </div>
 
       <PaymentMethodChips
@@ -149,7 +175,7 @@ export function EntryPage() {
         disabled={!canSave}
         onClick={handleSave}
       >
-        記録する
+        {savingsShort && state.amount > 0 ? "貯金が足りません" : "記録する"}
       </Button>
     </div>
   )
