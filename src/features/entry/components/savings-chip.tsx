@@ -25,10 +25,13 @@ export function SavingsChip({
       type="button"
       aria-pressed={selected}
       disabled={disabled}
-      className={chipClassName(selected, "disabled:opacity-50")}
+      className={chipClassName(
+        selected,
+        "h-8 gap-1 px-3 text-xs disabled:opacity-50"
+      )}
       onClick={onToggle}
     >
-      <PiggyBankIcon className="size-4" />
+      <PiggyBankIcon className="size-3.5" />
       自由貯金
       <span
         className={cn(

@@ -127,7 +127,16 @@ export function EntryPage() {
     <div className="mx-auto flex h-full max-w-md flex-col gap-2 px-4 pb-3 *:shrink-0">
       <TotalsHeader householdId={householdId} />
 
-      <div className="flex min-h-14 flex-1 flex-col justify-end pb-1">
+      {/* 自由貯金は金額と見比べられるよう金額の上に置く（日付・メモの行の幅を削らない） */}
+      <div className="flex min-h-14 flex-1 flex-col items-end justify-end gap-1 pb-1">
+        {showSavings && (
+          <SavingsChip
+            balance={savingsBalance}
+            selected={fromSavings}
+            insufficient={savingsShort}
+            onToggle={() => dispatch({ type: "toggle-savings" })}
+          />
+        )}
         <AmountDisplay amount={state.amount} />
       </div>
 
@@ -141,14 +150,6 @@ export function EntryPage() {
           value={state.memo}
           onChange={(memo) => dispatch({ type: "set-memo", memo })}
         />
-        {showSavings && (
-          <SavingsChip
-            balance={savingsBalance}
-            selected={fromSavings}
-            insufficient={savingsShort}
-            onToggle={() => dispatch({ type: "toggle-savings" })}
-          />
-        )}
       </div>
 
       <PaymentMethodChips
@@ -164,7 +165,12 @@ export function EntryPage() {
       />
 
       <Keypad
-        className="h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+        className={
+          // 自由貯金のチップ（高さ 32px + 間隔 4px）の分だけテンキーを低くする
+          showSavings
+            ? "h-[clamp(168px,calc(100dvh-464px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+            : "h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+        }
         onDigit={(key) => dispatch({ type: "digit", key })}
         onBackspace={() => dispatch({ type: "backspace" })}
         onClear={() => dispatch({ type: "clear" })}
