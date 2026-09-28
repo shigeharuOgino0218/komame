@@ -1,10 +1,10 @@
 import { cn } from "cn"
 
 import { Switch } from "@/components/ui/switch"
-import { formatCompactYen, formatYen } from "@/lib/money"
+import { formatYen } from "@/lib/money"
 
 /**
- * 自由貯金から払うかどうか。文字の部分をタップしても切り替わる。
+ * 自由貯金から払うかどうか。行のどこをタップしても切り替わる。
  * 残高が 0 以下ならオンにできない
  */
 export function SavingsSwitch({
@@ -24,27 +24,24 @@ export function SavingsSwitch({
   return (
     <label
       className={cn(
-        "flex shrink-0 touch-manipulation items-center gap-2 select-none",
+        "flex h-10 touch-manipulation items-center gap-2 rounded-full bg-card px-3.5 text-sm ring-1 ring-border transition-colors select-none ring-inset",
+        checked && "bg-primary/12 ring-primary/50",
         disabled && "opacity-50"
       )}
     >
-      <span className="flex flex-col gap-1 leading-none">
-        <span className="text-xs text-muted-foreground">貯金を使う</span>
-        <span
-          aria-label={
-            balance === undefined ? undefined : `残高 ${formatYen(balance)}`
-          }
-          className={cn(
-            "text-sm font-medium tabular-nums",
-            (insufficient || (balance !== undefined && balance < 0)) &&
-              "text-destructive"
-          )}
-        >
-          {balance === undefined ? "–" : formatCompactYen(balance)}
-        </span>
+      貯金を使う
+      <span
+        className={cn(
+          "text-muted-foreground tabular-nums",
+          (insufficient || (balance !== undefined && balance < 0)) &&
+            "text-destructive"
+        )}
+      >
+        {balance === undefined ? "–" : formatYen(balance)}
       </span>
       <Switch
         size="sm"
+        className="ml-auto"
         checked={checked}
         disabled={disabled}
         onCheckedChange={onToggle}

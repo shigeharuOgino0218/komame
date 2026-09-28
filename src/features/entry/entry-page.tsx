@@ -128,22 +128,17 @@ export function EntryPage() {
       <TotalsHeader householdId={householdId} />
 
       <div className="flex min-h-14 flex-1 flex-col justify-end pb-1">
-        {/* 金額は右寄せなので、左側の空きに自由貯金を置く（日付・メモの行の幅を削らない） */}
-        <div className="flex items-center gap-3">
-          {showSavings && (
-            <>
-              <SavingsSwitch
-                balance={savingsBalance}
-                checked={fromSavings}
-                insufficient={savingsShort}
-                onToggle={() => dispatch({ type: "toggle-savings" })}
-              />
-              <div aria-hidden className="h-8 w-px shrink-0 bg-border" />
-            </>
-          )}
-          <AmountDisplay amount={state.amount} />
-        </div>
+        <AmountDisplay amount={state.amount} />
       </div>
+
+      {showSavings && (
+        <SavingsSwitch
+          balance={savingsBalance}
+          checked={fromSavings}
+          insufficient={savingsShort}
+          onToggle={() => dispatch({ type: "toggle-savings" })}
+        />
+      )}
 
       <div className="flex gap-2">
         <DateChip
@@ -170,7 +165,12 @@ export function EntryPage() {
       />
 
       <Keypad
-        className="h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+        className={
+          // 自由貯金の行（高さ 40px + 間隔 8px）の分だけテンキーを低くする
+          showSavings
+            ? "h-[clamp(168px,calc(100dvh-476px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+            : "h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+        }
         onDigit={(key) => dispatch({ type: "digit", key })}
         onBackspace={() => dispatch({ type: "backspace" })}
         onClear={() => dispatch({ type: "clear" })}
