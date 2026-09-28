@@ -140,7 +140,7 @@ export function EntryPage() {
         />
       )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-1">
         <DateChip
           date={state.date}
           today={today}
