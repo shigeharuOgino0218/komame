@@ -127,17 +127,21 @@ export function EntryPage() {
     <div className="mx-auto flex h-full max-w-md flex-col gap-2 px-4 pb-3 *:shrink-0">
       <TotalsHeader householdId={householdId} />
 
-      {/* 自由貯金は金額と見比べられるよう金額の上に置く（日付・メモの行の幅を削らない） */}
-      <div className="flex min-h-14 flex-1 flex-col items-end justify-end gap-1 pb-1">
-        {showSavings && (
-          <SavingsChip
-            balance={savingsBalance}
-            selected={fromSavings}
-            insufficient={savingsShort}
-            onToggle={() => dispatch({ type: "toggle-savings" })}
-          />
-        )}
-        <AmountDisplay amount={state.amount} />
+      <div className="flex min-h-14 flex-1 flex-col justify-end pb-1">
+        {/* 金額は右寄せで最大7桁なので、左側の空きに自由貯金を置く（日付・メモの行の幅を削らない） */}
+        <div className="flex items-end gap-2">
+          {showSavings && (
+            <SavingsChip
+              balance={savingsBalance}
+              selected={fromSavings}
+              insufficient={savingsShort}
+              onToggle={() => dispatch({ type: "toggle-savings" })}
+            />
+          )}
+          <div className="ml-auto">
+            <AmountDisplay amount={state.amount} />
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-2">
@@ -166,9 +170,9 @@ export function EntryPage() {
 
       <Keypad
         className={
-          // 自由貯金のチップ（高さ 32px + 間隔 4px）の分だけテンキーを低くする
+          // 自由貯金のチップ（高さ 64px）で金額の行が 12px 高くなる分、テンキーを低くする
           showSavings
-            ? "h-[clamp(168px,calc(100dvh-464px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
+            ? "h-[clamp(168px,calc(100dvh-440px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
             : "h-[clamp(168px,calc(100dvh-428px-env(safe-area-inset-top)-env(safe-area-inset-bottom)),300px)]"
         }
         onDigit={(key) => dispatch({ type: "digit", key })}
