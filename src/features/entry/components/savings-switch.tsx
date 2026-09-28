@@ -24,15 +24,13 @@ export function SavingsSwitch({
   return (
     <label
       className={cn(
-        "flex h-10 touch-manipulation items-center gap-2 rounded-full bg-card px-3.5 text-sm ring-1 ring-border transition-colors select-none ring-inset",
-        checked && "bg-primary/12 ring-primary/50",
-        disabled && "opacity-50"
+        "flex h-10 touch-manipulation items-center gap-2 border-t text-sm transition-colors select-none"
       )}
     >
       貯金を使う
       <span
         className={cn(
-          "text-muted-foreground tabular-nums",
+          "text-primary tabular-nums",
           (insufficient || (balance !== undefined && balance < 0)) &&
             "text-destructive"
         )}
@@ -40,7 +38,6 @@ export function SavingsSwitch({
         {balance === undefined ? "–" : formatYen(balance)}
       </span>
       <Switch
-        size="sm"
         className="ml-auto"
         checked={checked}
         disabled={disabled}
