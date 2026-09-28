@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/features/auth/auth-provider"
+import { BudgetSection } from "@/features/settings/budget-section"
 import { ThemeSelect } from "@/features/settings/theme-select"
 import { supabase } from "@/lib/supabase"
 
@@ -42,6 +43,7 @@ export function SettingsPage() {
           <p className="text-xs text-muted-foreground">ログイン中</p>
           <p className="text-sm">{auth.session?.user.email}</p>
         </section>
+        <BudgetSection />
         <section className="flex flex-col gap-2">
           <h2 className="px-1 text-xs text-muted-foreground">テーマ</h2>
           <ThemeSelect />
