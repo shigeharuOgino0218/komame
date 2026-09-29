@@ -63,7 +63,7 @@ export function HistoryPage() {
               </h2>
               <ul>
                 {day.items.map((item) => (
-                  <li key={item.id}>
+                  <li key={item.id} className="border-b border-border/60">
                     <HistoryRow
                       item={item}
                       onSelect={() => {
