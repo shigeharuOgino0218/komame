@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   addDays,
   formatDateLabel,
+  formatDateTime,
   startOfMonth,
   startOfWeek,
   todayYmd,
@@ -49,5 +50,11 @@ describe("formatDateLabel", () => {
   it("それ以前は月/日(曜)、年が違えば年も付ける", () => {
     expect(formatDateLabel("2026-09-24", today)).toBe("9/24(木)")
     expect(formatDateLabel("2025-12-31", today)).toBe("2025/12/31(水)")
+  })
+})
+
+describe("formatDateTime", () => {
+  it("JST で表示する", () => {
+    expect(formatDateTime("2026-09-28T15:05:00+00:00")).toBe("2026/9/29 00:05")
   })
 })

@@ -15,8 +15,13 @@ export type NewTransaction = Required<
   >
 >
 
-/** id はクライアント生成。再送しても upsert なので重複しない */
-export async function insertTransaction(input: NewTransaction) {
+/**
+ * id はクライアント生成。再送しても upsert なので重複しない。
+ * created_at は削除の取り消しで元の並び順に戻すときだけ渡す
+ */
+export async function insertTransaction(
+  input: NewTransaction & Pick<TablesInsert<"transactions">, "created_at">
+) {
   const { error } = await supabase
     .from("transactions")
     .upsert(input, { onConflict: "id", ignoreDuplicates: true })

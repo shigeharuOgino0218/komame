@@ -5,17 +5,30 @@ import { BrandMark } from "@/components/brand-mark"
 import { PageHeader } from "@/components/page-header"
 import { MasterIcon } from "@/features/masters/master-icon"
 import { useHouseholdId } from "@/features/masters/queries"
+import { TransactionSheet } from "@/features/transactions/components/transaction-sheet"
 import { groupByDay, type HistoryItem } from "@/features/transactions/history"
 import { useHistory } from "@/features/transactions/queries"
+import { useDeleteTransaction } from "@/features/transactions/use-delete-transaction"
 import { formatDateLabel, todayYmd } from "@/lib/date"
 import { formatYen } from "@/lib/money"
 
 export function HistoryPage() {
   const householdId = useHouseholdId()
-  const { data, isPending, isError, hasNextPage, fetchNextPage, refetch } =
-    useHistory(householdId)
+  const {
+    data,
+    isPending,
+    isError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refetch,
+  } = useHistory(householdId)
   const days = React.useMemo(() => groupByDay(data?.pages.flat() ?? []), [data])
   const today = todayYmd()
+
+  const deleteTransaction = useDeleteTransaction()
+  const [selected, setSelected] = React.useState<HistoryItem>()
+  const [sheetOpen, setSheetOpen] = React.useState(false)
 
   return (
     <>
@@ -51,24 +64,57 @@ export function HistoryPage() {
               <ul>
                 {day.items.map((item) => (
                   <li key={item.id}>
-                    <HistoryRow item={item} />
+                    <HistoryRow
+                      item={item}
+                      onSelect={() => {
+                        setSelected(item)
+                        setSheetOpen(true)
+                      }}
+                    />
                   </li>
                 ))}
               </ul>
             </section>
           ))}
-          {hasNextPage && <LoadMore onVisible={() => void fetchNextPage()} />}
+          {hasNextPage && (
+            // ページが増えるたびに付け直し、まだ見えていれば続けて読み込む
+            <LoadMore
+              key={data.pages.length}
+              onVisible={() => {
+                if (!isFetchingNextPage) void fetchNextPage()
+              }}
+            />
+          )}
         </div>
       )}
+      <TransactionSheet
+        item={selected}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onDelete={(item) => {
+          setSheetOpen(false)
+          deleteTransaction(item)
+        }}
+      />
     </>
   )
 }
 
-function HistoryRow({ item }: { item: HistoryItem }) {
+function HistoryRow({
+  item,
+  onSelect,
+}: {
+  item: HistoryItem
+  onSelect: () => void
+}) {
   const sub = [item.memo, item.payment_method?.name].filter(Boolean).join("・")
 
   return (
-    <div className="flex h-14 w-full items-center gap-3 px-4 text-left">
+    <button
+      type="button"
+      className="flex h-14 w-full touch-manipulation items-center gap-3 px-4 text-left transition-colors active:bg-muted"
+      onClick={onSelect}
+    >
       <MasterIcon
         name={item.category?.icon ?? null}
         className="size-5 shrink-0 text-muted-foreground"
@@ -89,7 +135,7 @@ function HistoryRow({ item }: { item: HistoryItem }) {
       <span className="shrink-0 text-sm font-medium tabular-nums">
         {formatYen(item.amount)}
       </span>
-    </div>
+    </button>
   )
 }
 
