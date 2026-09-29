@@ -57,4 +57,4 @@ pnpm lint && pnpm build && pnpm test && pnpm db:test   # 変更後に必ず通�
 2. `pnpm lint && pnpm build && pnpm test && pnpm db:test` を通してコミットし、push して `gh pr create`
 3. マイグレーションを含むなら、マージ前に `pnpm db:push` で本番 DB に適用する（ユーザーの確認を取ってから）。フロントが新しい列を参照するため、DB を先に進める。適用状況は `supabase migration list --linked` で確認できる
 4. `gh pr merge <番号> --merge --delete-branch` でマージする（履歴はマージコミットで残している）
-5. 反映を確認する: `gh api repos/shigeharuOgino0218/komame/deployments --jq '.[0] | {environment, sha, created_at}'` で main のマージコミットに対する `Production` のデプロイがあること、`gh api repos/shigeharuOgino0218/komame/deployments/<id>/statuses --jq '.[0].state'` が `success` になること
+5. 反映を確認する: `gh api 'repos/{owner}/{repo}/deployments' --jq '.[0] | {id, environment, sha, created_at}'` で main のマージコミットに対する `Production` のデプロイがあること、`gh api 'repos/{owner}/{repo}/deployments/<id>/statuses' --jq '.[0].state'` が `success` になること
