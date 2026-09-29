@@ -57,7 +57,7 @@ export function HistoryPage() {
         <div className="pb-4">
           {days.map((day) => (
             <section key={day.date}>
-              <h2 className="sticky top-0 z-10 flex h-8 items-center justify-between bg-background px-4 text-xs text-muted-foreground">
+              <h2 className="sticky top-0 z-10 flex h-8 items-center justify-between bg-muted px-4 text-xs text-muted-foreground">
                 <span>{formatDateLabel(day.date, today)}</span>
                 <span className="tabular-nums">{formatYen(day.total)}</span>
               </h2>
