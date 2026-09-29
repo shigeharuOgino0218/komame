@@ -13,6 +13,15 @@ const ymdPartsFormatter = new Intl.DateTimeFormat("en-US", {
   day: "2-digit",
 })
 
+const dateTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: APP_TIME_ZONE,
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+})
+
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"] as const
 
 export function todayYmd(now: Date = new Date()): Ymd {
@@ -64,4 +73,9 @@ export function formatDateLabel(ymd: Ymd, today: Ymd = todayYmd()): string {
   const weekday = WEEKDAYS[toUtcDate(ymd).getUTCDay()]
   const monthDay = `${month}/${day}(${weekday})`
   return year === Number(today.slice(0, 4)) ? monthDay : `${year}/${monthDay}`
+}
+
+/** timestamptz を JST で 2026/9/29 09:05 */
+export function formatDateTime(iso: string): string {
+  return dateTimeFormatter.format(new Date(iso))
 }
